@@ -5,14 +5,15 @@ networks:
     driver: bridge
 
 volumes:
-    prometheus_data: {}
-    grafana_data: {}
+  prometheus_data: {}
+  grafana_data: {}
 
 services:
 
   prometheus:
     image: prom/prometheus:v2.17.1
     container_name: prometheus
+    platform: linux/arm64
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
@@ -34,6 +35,7 @@ services:
   alertmanager:
     image: prom/alertmanager:v0.20.0
     container_name: alertmanager
+    platform: linux/arm64
     volumes:
       - ./alertmanager:/etc/alertmanager
     command:
@@ -50,6 +52,7 @@ services:
   nodeexporter:
     image: prom/node-exporter:v0.18.1
     container_name: nodeexporter
+    platform: linux/arm64
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -70,6 +73,7 @@ services:
   cadvisor:
     image: gcr.io/google-containers/cadvisor:v0.34.0
     container_name: cadvisor
+    platform: linux/amd64   # no ARM build available, force amd64 emulation
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -87,6 +91,7 @@ services:
   grafana:
     image: grafana/grafana:main-ubuntu
     container_name: grafana
+    platform: linux/arm64
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -105,6 +110,7 @@ services:
   pushgateway:
     image: prom/pushgateway:v1.2.0
     container_name: pushgateway
+    platform: linux/arm64
     restart: unless-stopped
     expose:
       - 9091
@@ -116,6 +122,7 @@ services:
   caddy:
     image: stefanprodan/caddy
     container_name: caddy
+    platform: linux/amd64   # force amd64 since this image isn’t multi-arch
     ports:
       - "3000:3000"
       - "9090:9090"
